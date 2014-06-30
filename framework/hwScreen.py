@@ -12,22 +12,22 @@ import os
 # Add a method to display a picture, for instance from opencv
 
 class PiScreen:
-    def __init__(self):
+    def __init__(self, resx=128, resy=160):
         #Set the framebuffer device to be the TFT
         os.environ["SDL_FBDEV"] = "/dev/fb1"
 
         pygame.init()
 
-        self.size = [128, 160]
+        self.size = (resx, resy)
         self.black = 0, 0, 0
 
         pygame.mouse.set_visible(0)
-        self.screen = pygame.display.set_mode( self.size )
+        self.screen = pygame.display.set_mode(self.size)
 
         # Do some things on the screen to play around
         self.clear()
 
-        return 'Screen initialized'
+        print('Screen initialized')
 
     def clear(self):
         self.screen.fill((0, 0, 0))
@@ -68,3 +68,13 @@ class PiScreen:
         elif line == 2:
             textpos.centerx = 40
             self.screen.blit(text_rotated, textpos)
+
+    def display_pict(self, pict):
+        self.clear()
+        # TODO: Check the array type and its size, resize if needed
+        # Draw directly using OpenCV ?
+
+        surface = pygame.Surface(self.size)
+        pygame.surfarray.blit_array(surface, pict)
+
+        self.screen.blit(surface, self.size)
