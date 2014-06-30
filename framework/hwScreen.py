@@ -9,17 +9,16 @@ from time import strftime
 import os
 
 
-# Add a method to display a picture, for instance from opencv
+# TODO: Add a method to display a picture, for instance from opencv
 
 class PiScreen:
-    def __init__(self):
+    def __init__(self, size = (128,160)):
         #Set the framebuffer device to be the TFT
         os.environ["SDL_FBDEV"] = "/dev/fb1"
-
         pygame.init()
 
-        self.size = [128, 160]
-        self.black = 0, 0, 0
+        self.size = size
+        self.black = (0, 0, 0)
 
         pygame.mouse.set_visible(0)
         self.screen = pygame.display.set_mode( self.size )
@@ -30,10 +29,11 @@ class PiScreen:
         return 'Screen initialized'
 
     def clear(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill( self.black )
 
-    def fill(self, r, g, b):
-        self.screen.fill(r, g, b)
+    def fill(self, color):
+        "color is a 3-tuple"
+        self.screen.fill( color)
 
     def display_time(self):
         self.clear()
@@ -52,6 +52,7 @@ class PiScreen:
     def display_text(self, text, size, line, color, clear_screen):
         """Used to display text to the screen. displayText is only configured to display
         two lines on the TFT. Only clear screen when writing the first line"""
+        
         if clear_screen:
             self.clear()
 
@@ -68,3 +69,16 @@ class PiScreen:
         elif line == 2:
             textpos.centerx = 40
             self.screen.blit(text_rotated, textpos)
+
+    def displayFrame( self, frame ):
+        "Display numpy array-style frame"
+
+        # Handle dimensions issues:
+        # TODO
+        
+        # Convert the array to a pygame surf
+        surface = pygame.surfarray.make_surface(frame)
+        
+        # Push to the framebuffer
+        self.screen.blit(surface, (0,0) )
+        
