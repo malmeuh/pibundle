@@ -12,6 +12,7 @@ import frameGrabber # Wrap the frame grabbing process
 import frameFusion  # Wrap the frame accumulation process
 import time
 
+
 def run(n_max_frame):
     """
     The main part, get frames from the pi camera

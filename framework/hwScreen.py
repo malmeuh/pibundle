@@ -16,9 +16,9 @@ class PiScreen:
     def __init__(self, size = (128,160)):
         #Set the framebuffer device to be the TFT
         os.environ["SDL_FBDEV"] = "/dev/fb1"
-        pygame.init()
+        pygame.init()  # Already calls the font.init()
 
-        self.size = (resx, resy)
+        self.size = size
         self.black = 0, 0, 0
 
         pygame.mouse.set_visible(0)
@@ -50,7 +50,7 @@ class PiScreen:
 
             self.screen.blit(surf, (dim, 20))
 
-    def display_text(self, text, size, line, color, clear_screen):
+    def display_text(self, text, size=20, line=1, color=(255, 0, 0), clear_screen = False):
         """Used to display text to the screen. displayText is only configured to display
         two lines on the TFT. Only clear screen when writing the first line"""
         
@@ -58,7 +58,7 @@ class PiScreen:
             self.clear()
 
         font = pygame.font.Font(None, size)
-        text = font.render(text, 0, color)
+        text = font.render(text, 1, color)
         text_rotated = pygame.transform.rotate(text, -90)
         textpos = text_rotated.get_rect()
         textpos.centery = 80
@@ -80,4 +80,3 @@ class PiScreen:
         pygame.surfarray.blit_array(surface, pict)
 
         self.screen.blit(surface, self.size)
-        
