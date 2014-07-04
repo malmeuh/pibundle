@@ -44,7 +44,7 @@ class FrameFusion:
         self.n_max_corners = 400
         self.corners_q_level = 4
         self.motion_comp = motion_compensation
-        self.motion_compensation_method = 'shi_tomasi'
+        self.motion_compensation_method = 'orb'
         self.reset = False
 
         # Allocate buffers
@@ -89,16 +89,15 @@ class FrameFusion:
         return success
 
     def get_fused_frame(self, integer_frame=True):
-	# Return the frame in float
-	if not integer_frame:
-	    return self.frame_acc_disp
+        # Return the frame in float
+        if not integer_frame:
+            return self.frame_acc_disp
 
-	# Convert to uint8 and return (default)
-	else :
-	    self.frame_acc_disp *= 255
-	    frame_disp_int = self.frame_acc_disp.astype(int)
-	    return frame_disp_int
-    	    	
+        # Convert to uint8 and return (default)
+        else :
+            self.frame_acc_disp *= 255
+            frame_disp_int = self.frame_acc_disp.astype(int)
+            return frame_disp_int
 
     def pile_up(self, new_frame):
         """
@@ -115,14 +114,15 @@ class FrameFusion:
         # Do the accumulation with motion compensation
         # -- we offset the previous accumulation
         if self.motion_comp and self.n_fused_frames > 0:
-            b_success = self.compensate_interframe_motion(new_frame, 'shi_tomasi')
+            b_success = self.compensate_interframe_motion(new_frame, self.motion_compensation_method)
 
             if b_success:
                 print "Frames aligned"
             else:
                 print "Frames not aligned"
 
-        # Handle a reset of the accumulation (TODO : Make it automatic if the scene changes a lot)
+        # Handle a reset of the accumulation
+        # TODO: Make it automatic if the scene changes a lot
         if self.reset:
             self.frame_acc = np.float32(new_frame)
             self.reset = False
