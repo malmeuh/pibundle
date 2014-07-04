@@ -12,6 +12,7 @@ import frameGrabber # Wrap the frame grabbing process
 import frameFusion  # Wrap the frame accumulation process
 import time
 
+
 def run(n_max_frame):
     """
     The main part, get frames from the pi camera
@@ -29,8 +30,6 @@ def run(n_max_frame):
     # Process the stream frame by frame
     keep_going = True
     i = 0
-
-    base_filename = 'pict_fuse'
 
     while keep_going and i < n_max_frame:
         print "Grab frame {}".format(i)
@@ -53,15 +52,13 @@ def run(n_max_frame):
             if k == 27:
                 b_quit = True
                 cv2.destroyAllWindows()
-                cv2.imshow()
 
-            keep_going = keep_going and not(b_quit)
+            keep_going = keep_going and not b_quit
 
     print "Bybye.."
-    cv2.destroyWindow('Raw frame')
     frame_source.release()
 
     return
 
-# Bam ! Run this stuff
+# Bam ! Run this stuff for a number of frames
 run(50)
