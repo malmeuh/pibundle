@@ -31,8 +31,6 @@ def run(n_max_frame):
     keep_going = True
     i = 0
 
-    base_filename = 'pict_fuse'
-
     while keep_going and i < n_max_frame:
         print "Grab frame {}".format(i)
         keep_going, frame = frame_source.new_frame()
@@ -54,15 +52,13 @@ def run(n_max_frame):
             if k == 27:
                 b_quit = True
                 cv2.destroyAllWindows()
-                cv2.imshow()
 
-            keep_going = keep_going and not(b_quit)
+            keep_going = keep_going and not b_quit
 
     print "Bybye.."
-    cv2.destroyWindow('Raw frame')
     frame_source.release()
 
     return
 
-# Bam ! Run this stuff
+# Bam ! Run this stuff for a number of frames
 run(50)
