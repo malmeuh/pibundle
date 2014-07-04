@@ -46,6 +46,7 @@ class FrameFusion:
         self.motion_comp = motion_compensation
         self.motion_compensation_method = 'orb'
         self.reset = False
+        self.reset_ratio = 0.3
 
         # Allocate buffers
         self.frame_acc = np.float32(frame_first)
@@ -183,7 +184,12 @@ class FrameFusion:
             transform, mask = cv2.findHomography(self.corners_next, self.corners, cv2.RANSAC, 5.0)
 
             # Check that the transform indeed explains the corners shifts ?
-            # TODO: Quality check
+            mask_match = [m for m in mask if m == 1]
+            match_ratio = len(mask_match) / float(len(mask))
+            if match_ratio < self.reset_ratio:
+                self.reset = True
+                print "Accumulation reset, track lost - %d" % match_ratio
+                return False
 
             # Align the previous accumulated frame
             acc_frame_aligned = cv2.warpPerspective(self.frame_acc, transform, self.frame_acc.shape[2::-1])
