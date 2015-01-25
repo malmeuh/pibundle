@@ -4,7 +4,6 @@ import frameFinder
 import frameGrabber
 
 import os
-import cv2
 
 ref_pict_path = os.path.abspath("ref_picts")
 test_pict_path = os.path.abspath("test_picts")
