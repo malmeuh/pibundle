@@ -17,9 +17,9 @@ test_frame_source = frameGrabber.PictsFile(test_pict_path)
 test_picts = test_frame_source.get_pict_list()
 
 # Test the finder
-frame_finder = FrameFinder()
-frameFinder.declare_ref_frames(ref_picts)
+frame_finder = frameFinder.FrameFinder()
+frame_finder.declare_ref_frames(ref_picts)
 
 for pict in test_picts:
-    frameFinder.find_pict_pose(pict)
+    frame_finder.find_pict_pose(pict)
 
