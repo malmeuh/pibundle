@@ -17,10 +17,11 @@ from time import sleep
 import numpy as np
 import io, time
 
-try :
-  import picamera
+try:
+    import picamera
 except ImportError:
-  print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
+    print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
+
 
 class FrameGrabber:
     """
@@ -104,11 +105,13 @@ class PictsFile(FrameGrabber):
                             print "Error loading file {}".format(filename)
                         else:
                             n_files += 1
-
                     except:
                         print "Error loading file {}".format(filename)
 
         return picture_list, n_files
+
+    def get_pict_list(self):
+        return self.pict_list
 
     def new_frame(self):
         if self.n_frames < (self.n_max_frames-1):
