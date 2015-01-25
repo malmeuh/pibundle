@@ -1,9 +1,12 @@
 __author__ = 'benjamin'
 
+import sys
+sys.path.insert(0, '../framework')
+
 import frameFinder
 import frameGrabber
-
 import os
+import time
 
 ref_pict_path = os.path.abspath("ref_picts")
 test_pict_path = os.path.abspath("test_picts")
@@ -20,5 +23,8 @@ frame_finder = frameFinder.FrameFinder()
 frame_finder.declare_ref_frames(ref_picts)
 
 for pict in test_picts:
+    time_start = time.time()
     frame_finder.find_pict_pose(pict)
+    time_stop = time.time()
+    print "Took {:.2f} seconds to find".format(time_stop - time_start)
 
