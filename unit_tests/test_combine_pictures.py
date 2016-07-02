@@ -4,7 +4,6 @@ Created on Thu Sep 12 21:54:19 2013
 
 @author: Blefaudeux
 """
-
 import sys
 sys.path.insert(0, '../framework')
 
@@ -25,19 +24,23 @@ def get_user_choice():
         if (choice == 'V') or (choice == 'v'):
             path = raw_input("File/folder path ? (keep empty for defaults)")
             frame_source = frameGrabber.VideoFile(path)
-            choose_type= True
+            print "Video file selected"
+            choose_type = True
 
         elif (choice == 'P') or (choice == 'p'):
             path = raw_input("File/folder path ? (keep empty for defaults)")
             frame_source = frameGrabber.PictsFile(path)
-            choose_type= True
+            print "File sequence selected"
+            choose_type = True
 
         elif (choice == 'W') or (choice == 'w'):
             frame_source = frameGrabber.Webcam()
-            choose_type= True
+            print "Webcam selected"
+            choose_type = True
 
         elif (choice == 'W') or (choice == 'w'):
             frame_source = frameGrabber.PiCamera()
+            print "Rapsberry Pi camera selected"
             choose_type = True
 
     return frame_source
@@ -76,7 +79,7 @@ def run(n_max_frame):
 
             # Initialize the accumulated frame
             if i == 0:
-                frame_accumulator = frameFusion.FrameFusion(frame_bw, gamma, False)
+                frame_accumulator = frameFusion.FrameFusion(frame_bw, gamma, True)
 
             # Process frames :
             else:
