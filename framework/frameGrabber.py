@@ -12,10 +12,11 @@ from __future__ import division
 import cv2
 import os
 import utils as ut
-from time import sleep
 
 import numpy as np
-import io, time
+import io
+import threading
+import Queue
 
 try:
     import picamera
@@ -59,6 +60,9 @@ class FrameGrabber:
     def new_frame(self):
         raise 'Abstract method, please override'
 
+    def populate(self, picture_queue, framerate):
+        raise 'Abstract method, please override'
+
 
 class PictsFile(FrameGrabber):
     """
@@ -96,7 +100,7 @@ class PictsFile(FrameGrabber):
 
                 if (filename[-3:] == "bmp") or \
                         (filename[-3:] == "png") or \
-                        (filename[-3:] == "jpg") :
+                        (filename[-3:] == "jpg"):
 
                     try:
                         picture_list.append(cv2.imread(full_filepath, cv2.CV_LOAD_IMAGE_GRAYSCALE))
@@ -120,6 +124,27 @@ class PictsFile(FrameGrabber):
 
         else:
             return [False, []]
+
+    def _append_pict(self, picture_queue, framerate):
+        import time
+        keep_going = True
+        sleep_time = 1.0/framerate
+
+        while keep_going:
+            keep_going, pict = self.new_frame()
+
+            if keep_going:
+                print("New picture put in queue")
+                picture_queue.put(pict)
+            time.sleep(sleep_time)
+
+    def populate(self, picture_queue, framerate):
+        # Check that the picture_queue is indeed a queue..
+        # if !isinstance(picture_queue, Queue)
+
+        # Spawn a thread, which will read a picture
+        t = threading.Thread(target=self._append_pict, args=(picture_queue, framerate))
+        t.start()
 
     def show(self):
         FrameGrabber.__show_pict_window(self.frame)

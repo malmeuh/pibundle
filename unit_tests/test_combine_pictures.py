@@ -4,7 +4,6 @@ Created on Thu Sep 12 21:54:19 2013
 
 @author: Blefaudeux
 """
-
 import sys
 sys.path.insert(0, '../framework')
 

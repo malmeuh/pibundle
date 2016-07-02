@@ -24,7 +24,7 @@ def run(n_max_frame):
     gamma = 0.8  # The gamma curve parameter.. lower value lightens the picture
 
     # Get the inputs
-    frame_source = frameGrabber.Webcam()
+    frame_source = frameGrabber.Webcam(1)
     print "Opening webcam"
 
     # Process the stream frame by frame
