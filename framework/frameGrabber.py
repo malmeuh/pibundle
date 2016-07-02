@@ -18,11 +18,6 @@ import io
 import threading
 import Queue
 
-try:
-    import picamera
-except ImportError:
-    print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
-
 
 class FrameGrabber:
     """
@@ -94,16 +89,17 @@ class PictsFile(FrameGrabber):
             filenames = ut.sort_nicely(filenames)
 
             for filename in filenames:
-                print "Reading file {}".format(filename)
 
                 full_filepath = os.path.join(folder_path, filename)
+                print "Reading file {}".format(full_filepath)
 
                 if (filename[-3:] == "bmp") or \
                         (filename[-3:] == "png") or \
                         (filename[-3:] == "jpg"):
 
                     try:
-                        picture_list.append(cv2.imread(full_filepath, cv2.CV_LOAD_IMAGE_GRAYSCALE))
+                        picture_list.append(cv2.imread(full_filepath))
+
                         if picture_list[n_files] is None:
                             picture_list.pop()
                             print "Error loading file {}".format(filename)
@@ -125,6 +121,9 @@ class PictsFile(FrameGrabber):
         else:
             return [False, []]
 
+    def release(self):
+        pass
+
     def _append_pict(self, picture_queue, framerate):
         import time
         keep_going = True
@@ -136,6 +135,7 @@ class PictsFile(FrameGrabber):
             if keep_going:
                 print("New picture put in queue")
                 picture_queue.put(pict)
+
             time.sleep(sleep_time)
 
     def populate(self, picture_queue, framerate):
@@ -229,8 +229,15 @@ class Webcam(FrameGrabber):
     def release(self):
         self.cam.release()
 
+
 class PiCamera(FrameGrabber):
     def __init__(self):
+        try:
+            import picamera
+
+        except ImportError:
+            print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
+
         # Declare the new interface with the cam,
         # select a small definition by default
         self.cam = picamera.PiCamera()
