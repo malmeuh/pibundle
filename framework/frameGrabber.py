@@ -12,15 +12,12 @@ from __future__ import division
 import cv2
 import os
 import utils as ut
-from time import sleep
 
 import numpy as np
-import io, time
+import io
+import threading
+import Queue
 
-try :
-  import picamera
-except ImportError:
-  print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
 
 class FrameGrabber:
     """
@@ -58,6 +55,9 @@ class FrameGrabber:
     def new_frame(self):
         raise 'Abstract method, please override'
 
+    def populate(self, picture_queue, framerate):
+        raise 'Abstract method, please override'
+
 
 class PictsFile(FrameGrabber):
     """
@@ -89,26 +89,29 @@ class PictsFile(FrameGrabber):
             filenames = ut.sort_nicely(filenames)
 
             for filename in filenames:
-                print "Reading file {}".format(filename)
 
                 full_filepath = os.path.join(folder_path, filename)
+                print "Reading file {}".format(full_filepath)
 
                 if (filename[-3:] == "bmp") or \
                         (filename[-3:] == "png") or \
-                        (filename[-3:] == "jpg") :
+                        (filename[-3:] == "jpg"):
 
                     try:
-                        picture_list.append(cv2.imread(full_filepath, cv2.CV_LOAD_IMAGE_GRAYSCALE))
+                        picture_list.append(cv2.imread(full_filepath))
+
                         if picture_list[n_files] is None:
                             picture_list.pop()
                             print "Error loading file {}".format(filename)
                         else:
                             n_files += 1
-
                     except:
                         print "Error loading file {}".format(filename)
 
         return picture_list, n_files
+
+    def get_pict_list(self):
+        return self.pict_list
 
     def new_frame(self):
         if self.n_frames < (self.n_max_frames-1):
@@ -117,6 +120,31 @@ class PictsFile(FrameGrabber):
 
         else:
             return [False, []]
+
+    def release(self):
+        pass
+
+    def _append_pict(self, picture_queue, framerate):
+        import time
+        keep_going = True
+        sleep_time = 1.0/framerate
+
+        while keep_going:
+            keep_going, pict = self.new_frame()
+
+            if keep_going:
+                print("New picture put in queue")
+                picture_queue.put(pict)
+
+            time.sleep(sleep_time)
+
+    def populate(self, picture_queue, framerate):
+        # Check that the picture_queue is indeed a queue..
+        # if !isinstance(picture_queue, Queue)
+
+        # Spawn a thread, which will read a picture
+        t = threading.Thread(target=self._append_pict, args=(picture_queue, framerate))
+        t.start()
 
     def show(self):
         FrameGrabber.__show_pict_window(self.frame)
@@ -201,8 +229,15 @@ class Webcam(FrameGrabber):
     def release(self):
         self.cam.release()
 
+
 class PiCamera(FrameGrabber):
     def __init__(self):
+        try:
+            import picamera
+
+        except ImportError:
+            print "Could not import RaspberryPi camera dependencies. \n -- Please install picamera --"
+
         # Declare the new interface with the cam,
         # select a small definition by default
         self.cam = picamera.PiCamera()
